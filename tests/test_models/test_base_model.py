@@ -1,5 +1,5 @@
 #!/usr/bin/python3
-""" """
+"""Unittest Module for the BaseModel class."""
 from models.base_model import BaseModel
 import unittest
 import datetime
