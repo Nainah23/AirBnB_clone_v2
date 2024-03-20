@@ -3,7 +3,13 @@
 from models.base_model import BaseModel, Base
 from sqlalchemy import Column, Integer, String
 from sqlalchemy import Float, ForeignKey
+from sqlalchemy.orm import relationship
 
+place_amenity = Table('place_amenity', Base.metadata,
+                      Column('place_id', String(60), primary_key=True,
+                             nullable=False, ForeignKey('places.id')),
+                      Column('amenity_id', String(60), primary_key=True,
+                             nullable=False, ForeignKey('amenities.id')))
 
 class Place(BaseModel, Base):
     """ A place to stay """
@@ -19,3 +25,20 @@ class Place(BaseModel, Base):
     latitude = Column(Float)
     longitude = Column(Float)
     amenity_ids = []
+
+    if getenv('HBNB_TYPE_STORAGE') == 'db':
+        amenity = relationship('Amenity',
+                               secondary=place_amenity,
+                               viewonly=False,
+                               back_populates='place_amenitites')
+    else:
+        @property
+        def amenities(self):
+            """getter method for amenitites."""
+            return self.amenity_ids
+
+        @amenitites.setter
+        def amenitities(self, obj):
+            """Adds an amenity.id to amenity_id."""
+            if type(obj) == Amenity and obj not in self.amenity_ids:
+                self.amenity_ids.append(obj.id)
