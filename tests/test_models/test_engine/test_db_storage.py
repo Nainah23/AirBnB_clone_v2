@@ -6,10 +6,29 @@ from models.base_model import BaseModel, Base
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
 from models import storage
+from models.engine.db_storage import DBStorage
 import os
 from os import getenv
 
 @unittest.skipIf(getenv('HBNB_TYPE_STORAGE') != 'DB')
+class TestDBStorage(unittest.TestCase):
+    """Tests for the database engine."""
+
+    @patch('sqlalchemy.create_engine')
+    @patch('sqlalchemy.orm.sessionmaker')
+    def test_init(self, mock_sess, mock):
+        fake_engine = MagicMock()
+        mock.return_value = fake_engine
+
+        mock_s = MagicMock()
+        mock_sess.return_value = mock_s
+
+        storage = DBStorage()
+
+        mock.assert_called_once()
+        mock_sess.assert_called_once()
+
+
 class TestDBStorageDocs(unittest.TestCase):
     """Tests to check the documentation and style of DBStorage class"""
 
