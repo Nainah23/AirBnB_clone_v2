@@ -28,6 +28,7 @@ class TestDBStorage(unittest.TestCase):
                                                            os.getenv('HBNB_MYSQL_DB'),),
                                                    pool_pre_ping=True)
 
+
 @unittest.skipIf(getenv('HBNB_TYPE_STORAGE') != 'db')
 class TestDBStorageDocumentation(unittest.TestCase):
     """Tests to verify the documentation and style of DBStorage class"""
