@@ -11,6 +11,7 @@ class State(BaseModel, Base):
     name = Column(String(128), nullable=False)
     cities = relationship("City",
                           cascade='all, delete-orphan', backref='state')
+
     @property
     def cities(self):
         """Returns a list of cities linked to state_id"""

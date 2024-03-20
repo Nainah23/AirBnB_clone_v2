@@ -8,6 +8,7 @@ import models
 
 Base = declarative_base()
 
+
 class BaseModel:
     """A base class for all hbnb models"""
 
@@ -34,12 +35,12 @@ class BaseModel:
             else:
                 self.created_at = datetime.now()
 
+            if '__class__' in kwargs:
+                del kwargs['__class__']
+
             for k, v in kwargs.items():
                 if k != 'updated_at' or k != 'created_at':
                     setattr(self, k, v)
-
-            if '__class__' in kwargs:
-                del kwargs['__class__']
 
             self.__dict__.update(kwargs)
 

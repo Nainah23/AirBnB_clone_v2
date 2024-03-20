@@ -39,6 +39,8 @@ class DBStorage:
             for cl in classes:
                 obj_list.extend(self.__session.query(cl).all())
         else:
+            if type(cls) is str:
+                cls = eval(cls)
             obj_list.extend(self.__session.query(cls).all())
 
         for obj in obj_list:
