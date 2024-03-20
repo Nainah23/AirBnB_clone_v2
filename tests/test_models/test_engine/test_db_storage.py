@@ -10,71 +10,71 @@ from models.engine.db_storage import DBStorage
 import os
 from os import getenv
 
-@unittest.skipIf(getenv('HBNB_TYPE_STORAGE') != 'DB')
+@unittest.skipIf(getenv('HBNB_TYPE_STORAGE') != 'db')
 class TestDBStorage(unittest.TestCase):
     """Tests for the database engine."""
 
-    @patch('sqlalchemy.create_engine')
-    @patch('sqlalchemy.orm.sessionmaker')
-    def test_init(self, mock_sess, mock):
-        fake_engine = MagicMock()
-        mock.return_value = fake_engine
-
-        mock_s = MagicMock()
-        mock_sess.return_value = mock_s
+    def test_db_connection(self, mock_create_engine):
+        """Test the database connection."""
+        mock_engine = MagicMock()
+        mock_create_engine.return_value = mock_engine
 
         storage = DBStorage()
 
-        mock.assert_called_once()
-        mock_sess.assert_called_once()
+        mock_create_engine.assert_called_once_with('mysql+mysqldb://{}:{}@{}/{}'
+                                                   .format(os.getenv('HBNB_MYSQL_USER'),
+                                                           os.getenv('HBNB_MYSQL_PWD'),
+                                                           os.getenv('HBNB_MYSQL_HOST'),
+                                                           os.getenv('HBNB_MYSQL_DB'),),
+                                                   pool_pre_ping=True)
 
-
-class TestDBStorageDocs(unittest.TestCase):
-    """Tests to check the documentation and style of DBStorage class"""
+@unittest.skipIf(getenv('HBNB_TYPE_STORAGE') != 'db')
+class TestDBStorageDocumentation(unittest.TestCase):
+    """Tests to verify the documentation and style of DBStorage class"""
 
     @classmethod
-    def setUp(cls):
-        """Prepare for the documentation tests."""
-        cls.funcs = inspect.getmembers(DBStorage, inspect.isfunction)
+    def setUpClass(cls):
+        """Set up for the docstring tests."""
+        cls.dbstorage_methods = inspect.getmembers(DBStorage, inspect.isfunction)
 
-    def test_function_docs(self):
-        """Test that all functions have documentation."""
-        for func_name, func in self.funcs:
-            self.assertIsNotNone(func.__doc__, f"{func_name} lacks documentation")
+    def test_method_docs(self):
+        """Test that all methods are documented."""
+        for method_name, method in self.dbstorage_methods:
+            self.assertIsNotNone(method.__doc__, f"{method_name} is missing a docstring")
 
-        def test_db_storage_module_docstring(self):
-        """Test for the db_storage.py module docstring"""
+    def test_db_storage_module_docstring(self):
+        """Test for the presence of a module docstring"""
         self.assertIsNot(db_storage.__doc__, None,
-                         "db_storage.py needs a docstring")
+                         "The db_storage.py module needs a docstring")
         self.assertTrue(len(db_storage.__doc__) >= 1,
-                        "db_storage.py needs a docstring")
+                        "The db_storage.py module needs a docstring")
 
     def test_db_storage_class_docstring(self):
-        """Test for the DBStorage class docstring"""
+        """Test for the presence of a class docstring"""
         self.assertIsNot(DBStorage.__doc__, None,
-                         "DBStorage class needs a docstring")
+                         "The DBStorage class needs a docstring")
         self.assertTrue(len(DBStorage.__doc__) >= 1,
-                        "DBStorage class needs a docstring")
+                        "The DBStorage class needs a docstring")
 
-    def test_pep8_conformance_db_storage(self):
-        """Test if db_storage.py conformant to PEP8."""
-        pep = pycodestyle.StyleGuide(quiet=True)
-        result = pep.check_files(['models/engine/db_storage.py'])
+    def test_pep8_compliance_db_storage(self):
+        """Test that db_storage.py adheres to PEP8."""
+        style_guide = pycodestyle.StyleGuide(quiet=True)
+        result = style_guide.check_files(['models/engine/db_storage.py'])
         self.assertEqual(result.total_errors, 0,
-                         "Found code style errors (and warnings).")
+                         "Found code style errors and warnings.")
 
-    def test_pep8_conformance_test_db_storage(self):
-            """Test tests/test_models/test_db_storage.py conforms to PEP8."""
-            pep8s = pycodestyle.StyleGuide(quiet=True)
-            result = pep8s.check_files(['tests/test_models/test_engine/\
-    test_db_storage.py'])
-            self.assertEqual(result.total_errors, 0,
-                             "Found code style errors (and warnings).")
+    def test_pep8_compliance_test_db_storage(self):
+        """Test that tests/test_models/test_db_storage.py adheres to PEP8."""
+        style_guide = pycodestyle.StyleGuide(quiet=True)
+        result = style_guide.check_files(['tests/test_models/test_engine/test_db_storage.py'])
+        self.assertEqual(result.total_errors, 0,
+                         "Found code style errors and warnings.")
 
-    def test_funcsunc_docstrings(self):
+    def test_method_docstrings(self):
         """Test for the presence of docstrings in DBStorage methods"""
-        for func in self.funcs:
-            self.assertIsNot(func[1].__doc__, None,
-                             "{:s} method needs a docstring".format(func[0]))
-            self.assertTrue(len(func[1].__doc__) >= 1,
-                            "{:s} method needs a docstring".format(func[0])) 
+        for method in self.dbstorage_methods:
+            self.assertIsNot(method[1].__doc__, None,
+                             f"The {method[0]} method needs a docstring")
+            self.assertTrue(len(method[1].__doc__) >= 1,
+                            f"The {method[0]} method needs a docstring")
+
