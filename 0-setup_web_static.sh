@@ -1,32 +1,27 @@
 #!/usr/bin/env bash
-# sets up the web server for deployment of web static
+# script that sets up web servers for the deployment of web_static
+sudo apt-get update
+sudo apt-get -y install nginx
+sudo ufw allow 'Nginx HTTP'
 
-#install nginx if it doesn't exist
-apt-get -y update
-apt-get -y install nginx
+sudo mkdir -p /data/
+sudo mkdir -p /data/web_static/
+sudo mkdir -p /data/web_static/releases/
+sudo mkdir -p /data/web_static/shared/
+sudo mkdir -p /data/web_static/releases/test/
+sudo touch /data/web_static/releases/test/index.html
+sudo echo "<html>
+  <head>
+  </head>
+  <body>
+    Holberton School
+  </body>
+</html>" | sudo tee /data/web_static/releases/test/index.html
 
-# create required directories
-mkdir -p /data/web_static/releases/test/
-mkdir -p /data/web_static/shared/
+sudo ln -s -f /data/web_static/releases/test/ /data/web_static/current
 
-# store test html file content in a variable
-index='<!DOCTYPE html>\n<html lang="en">\n<head>\n\t<meta charset="UTF-8" />\n\t<title>Hello, world!</title>\n\t<meta name="viewport" content="width=device-width,initial-scale=1" />\n\t<meta name="description" content="" />\n\t<link rel="icon" href="favicon.png">\n</head>\n<body>\n\t<h1>Hello, world!</h1>\n</body>\n</html>'
+sudo chown -R ubuntu:ubuntu /data/
 
-# save the content to a file named index.html
-echo -e ${index} > /data/web_static/releases/test/index.html
+sudo sed -i '/listen 80 default_server/a location /hbnb_static { alias /data/web_static/current/;}' /etc/nginx/sites-enabled/default
 
-# create a symbolic link to the test directory
-ln -sf /data/web_static/current /data/web_static/releases/test/
-
-# change ownership of /data directory to user ubuntu
-chown -R ubuntu /data/
-chgrp -R ubuntu /data/
-
-new_config="\t}\n\tlocation /hbnb_static/ {\n\t\talias /data/web_static/current/;"
-
-sed -i "s/include \/etc\/nginx\/sites-enabled\/\*;/include \/etc\/nginx\/sites-enabled\/\*;\n\tadd_header X-Served-By \"$HOSTNAME\";/" /etc/nginx/nginx.conf
-
-# configures nginx 
-sed -i "\/^\\t\\ttry_files \$uri \$uri\/ \404\;/r $new_config"
-
-service nginx start
+sudo service nginx restart
