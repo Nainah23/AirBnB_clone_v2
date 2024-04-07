@@ -2,10 +2,10 @@
 """A module for Fabric script that generates a .tgz archive."""
 import os
 from datetime import datetime
-from fabric import task, run
+from fabric.api import local, runs_once
 
 
-@task
+@runs_once
 def do_pack():
     """Archives the static files."""
     if not os.path.isdir("versions"):
